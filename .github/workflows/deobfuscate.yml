@@ -3,7 +3,7 @@ name: Deep Deobfuscate Malware
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # Cho phép chạy thủ công
+  workflow_dispatch:
 
 jobs:
   deobfuscate:
@@ -17,11 +17,12 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.10'  # Đổi sang Python 3.10 để tương thích
     
-    - name: Install dependencies
+    - name: Install dependencies (chỉ cần cái cần thiết)
       run: |
-        pip install pylzma base91 pybase64 pycrypto
+        # Chỉ cài đúng những thứ cần, bỏ pycrypto
+        pip install base91
     
     - name: Run full deobfuscation
       run: python deobfuscate.py
@@ -36,12 +37,6 @@ jobs:
           payload_*.py
           payload_*.bin
           deobfuscation_report.txt
-          *.log
+          decoded_*.py
+          decoded_*.bin
         retention-days: 7
-    
-    - name: Upload to VirusTotal (optional)
-      if: success()
-      uses: actions/upload-artifact@v4
-      with:
-        name: for-virustotal
-        path: for_vt.txt
